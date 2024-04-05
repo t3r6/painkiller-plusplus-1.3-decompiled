@@ -1,0 +1,75 @@
+o.Mesh = "polySurfaceShape58437"
+o.Pack = "szuriken_ammo.dat"
+o.Scale = 0.75
+o.DisabledInVoosh = true
+o.RespawnTime = 15
+o.AmmoAdd = 25
+o.s_SubClass ={}
+o.takeDistance = 1.8
+--============================================================================
+function o:OnInitTemplate()
+    self.CubeMap = nil
+    self.DetailMap = nil
+    self.NormalMap = nil
+    self.Destroy = nil
+    self.Impulse = nil
+    self:ReplaceFunction("_Synchronize","Synchronize")
+    self:ReplaceFunction("Synchronize","nil")
+end
+--============================================================================
+function AmmoShurikens:OnCreateEntity()
+	ENTITY.SetSynchroString(self._Entity,"AmmoShurikens.CItem")
+    ENTITY.EnableNetworkSynchronization(self._Entity)
+	self:Client_OnCreateEntity(self._Entity)
+end
+--============================================================================
+--OriOn_Modification=######################################################################
+function AmmoShurikens:Client_OnCreateEntity(entity)
+	if not IsDedicatedServer() then	
+		if Cfg.SimpleItems then	
+			if ENTITY.IsDrawEnabled(entity) then
+				ENTITY.EnableDraw(entity,false,true)
+				local e = ENTITY.Create(ETypes.Billboard,"Script","AmmoShurikens")
+				local tex = "SIicon/Ammo/ammo_shuriken"
+				BILLBOARD.SetupCorona(e,1,0,0,0,0,0.7,0,0,0,tex,Color:New(204,0,255,0):Compose(),4,true)    
+				ENTITY.SetPosition(e,0,0,0)
+				ENTITY.RegisterChild(entity,e,true,0) 
+				WORLD.AddEntity(e)
+			end
+		end
+	end
+end
+--OriOn_Modification=end=######################################################################
+--============================================================================
+function AmmoShurikens:OnTake(player)
+    if player.Ammo.Shurikens >= CPlayer.s_SubClass.MaxAmmo.Shurikens then return true end
+
+    self.TakeFX(player._Entity, self.AmmoAdd)
+	Game.PlayerAmmoFound =  Game.PlayerAmmoFound + 1
+end
+--============================================================================
+function AmmoShurikens:TakeFX(pe,add)
+    local player = EntityToObject[pe]
+    
+    if player then
+        player.Ammo.Shurikens = player.Ammo.Shurikens + add * AmmoDifficultyModifier[Game.Difficulty] * Game.AmmoFoundFactor
+        player:CheckMaxAmmo()
+        if player == Player then player:PickupFX() end
+    end
+
+    Templates["AmmoShurikens.CItem"]:SndEnt("pickup",pe)
+end
+Network:RegisterMethod("AmmoShurikens.TakeFX", NCallOn.ServerAndAllClients, NMode.Reliable, "eu")
+--OriOn_Modification=######################################################################
+--============================================================================
+function AmmoShurikens:Client_OnCreateSimpleItems(entity)
+	ENTITY.KillAllChildrenByName(entity,"AmmoShurikens") -- Pas frocément utile mais par sécuruté
+	local e = ENTITY.Create(ETypes.Billboard,"Script","AmmoShurikens")
+	local tex = "SIicon/Ammo/ammo_shuriken"
+	BILLBOARD.SetupCorona(e,1,0,0,0,0,0.7,0,0,0,tex,Color:New(204,0,255,0):Compose(),4,true)    
+	ENTITY.SetPosition(e,0,0,0)
+	ENTITY.RegisterChild(entity,e,true,0) 
+	WORLD.AddEntity(e)
+end
+--OriOn_Modification=end=######################################################################
+--============================================================================

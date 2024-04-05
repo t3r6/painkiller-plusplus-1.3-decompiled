@@ -1,0 +1,112 @@
+Health.Model = "Energy"
+Health.Scale = 0.4
+o.DisabledInVoosh = false
+Health.takeDistance = 1.5
+Health.RespawnTime = 25
+Health.HealthAdd = 25
+Health.MaxLimit  = 100
+Health.MaxLimit  = 100
+o.s_SubClass ={}
+
+--============================================================================
+function Health:OnPrecache()
+	Cache:PrecacheParticleFX("energy")
+	Cache:PrecacheParticleFX("energyhealth1")
+	Cache:PrecacheParticleFX("energyhealth")
+end
+--============================================================================
+function Health:OnCreateEntity()
+    local param = "25"
+	if self.HealthAdd == 50 then
+		param = "50"
+	end
+	ENTITY.SetSynchroString(self._Entity,"Health.CItem"..":"..param)
+    ENTITY.EnableNetworkSynchronization(self._Entity,true,true)
+    self:Client_OnCreateEntity(self._Entity,param)
+end
+--============================================================================
+function Health:Client_OnCreateEntity(entity,param)
+	if not Cfg.SimpleItems then  
+		if param == "50" then
+			BindFX(entity,"energy",0.2,"root")
+			BindFX(entity,"energy",0.2,"e1")
+			BindFX(entity,"energy",0.2,"e2")
+			BindFX(entity,"energy",0.2,"e3")
+			BindFX(entity,"energy",0.2,"e4")
+			BindFX(entity,"energy",0.2,"e5")
+			BindFX(entity,"energy",0.2,"e6")
+		else
+			BindFX(entity,"energyhealth1",0.2,"root")
+			BindFX(entity,"energyhealth",0.2,"e1")
+			BindFX(entity,"energyhealth",0.2,"e2")
+			BindFX(entity,"energyhealth",0.2,"e3")
+			BindFX(entity,"energyhealth",0.2,"e4")
+			BindFX(entity,"energyhealth",0.2,"e5")
+			BindFX(entity,"energyhealth",0.2,"e6")
+		end	
+	    -- jezeli jest wziety to musze schowac particle
+	    if not ENTITY.IsDrawEnabled(entity) then
+	        ENTITY.EnableDraw(entity,false,true)
+	    end
+	else
+		local color = {0,255,0}
+		if param == "50" then
+			color = {255,102,0}
+		end
+		if not IsDedicatedServer() then
+			MDL.SetAnim(entity,"none")
+			if ENTITY.IsDrawEnabled(entity) then
+				ENTITY.EnableDraw(entity,false,true)
+				local e = ENTITY.Create(ETypes.Billboard,"Script","Health")
+				local tex = "SIicon/health_si"
+				BILLBOARD.SetupCorona(e,1,0,0,0,0,0.7,0,0,0,tex,Color:New(color[1],color[2],color[3],0):Compose(),4,true)    
+				ENTITY.SetPosition(e,0,0,0)
+				ENTITY.RegisterChild(entity,e,true,0) 
+				WORLD.AddEntity(e)
+			end
+		end
+	end
+end
+--============================================================================
+function Health:OnTake(player)    
+    if player.Health < Game.HealthCapacity then
+        player.Health = player.Health + self.HealthAdd
+        if player.Health > Game.HealthCapacity then player.Health = Game.HealthCapacity  end
+        self.TakeFX(player._Entity,player.Health)
+    else
+        return true
+    end
+end
+--============================================================================
+function Health:TakeFX(pe,health)
+    local player = EntityToObject[pe]    
+    if player then
+        player.Health = health
+        player._healthDecCnt = 0
+        if player == Player then player:PickupFX() end
+    end    
+    Templates["Health.CItem"]:SndEnt("pickup",pe)
+end
+Network:RegisterMethod("Health.TakeFX", NCallOn.ServerAndAllClients, NMode.Reliable, "eu")
+--============================================================================
+function Health:OnInitTemplate()
+    self._Synchronize = self.Synchronize
+    self.Synchronize = nil
+end
+--OriOn_Modification=######################################################################
+--============================================================================
+function Health:Client_OnCreateSimpleItems(entity,param)
+	ENTITY.KillAllChildrenByName(entity,"Health") -- Pas frocément utile mais par sécuruté
+	local e = ENTITY.Create(ETypes.Billboard,"Script","Health")
+	local tex = "SIicon/health_si"
+	local color = {0,255,0}
+	if param == "50" then
+		color = {255,102,0}
+	end
+	BILLBOARD.SetupCorona(e,1,0,0,0,0,0.7,0,0,0,tex,Color:New(color[1],color[2],color[3],0):Compose(),4,true)    
+	ENTITY.SetPosition(e,0,0,0)
+	ENTITY.RegisterChild(entity,e,true,0) 
+	WORLD.AddEntity(e)
+end
+--OriOn_Modification=end=######################################################################
+--============================================================================

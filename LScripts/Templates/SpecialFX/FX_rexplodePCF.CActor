@@ -1,0 +1,44 @@
+EDITOR.AddObjectTemplate("Particles","FX_rexplodePCF","FX_rexplodePCF.CActor");	
+
+FX_rexplodePCF.Model = "rexplode"
+FX_rexplodePCF.Scale = 3.0
+FX_rexplodePCF.NotCountable = true
+
+FX_rexplodePCF.s_SubClass = 
+{
+    Animations = {  
+        idle        = {0.7},
+    },
+}
+
+function FX_rexplodePCF:OnPrecache()
+	Cache:PrecacheParticleFX("FX_rexplodePCF")
+	Cache:PrecacheParticleFX("FX_rexplodePCFNoSmoke")
+	Cache:PrecacheParticleFX("FX_rexplodePCFNoImpact")
+end
+
+function FX_rexplodePCF:OnCreateEntity()
+   
+	if not Cfg.NoSmoke and not Cfg.NoExplosions then			--OriOn_Modification
+		self:BindFX("FX_rexplodePCF",0.2,"e0")
+	elseif Cfg.NoSmoke and not Cfg.NoExplosions then
+		self:BindFX("FX_rexplodePCFNoSmoke",0.2,"e0")
+	elseif not Cfg.NoSmoke and Cfg.NoExplosions then
+		self:BindFX("FX_rexplodePCFNoImpact",0.2,"e0")		--=end=OriOn_Modification
+	end
+
+end
+
+function FX_rexplodePCF:OnFinishAnim(name)
+    GObjects:ToKill(self)
+end
+
+
+function FX_rexplodePCF:OnEditTick(delta)
+    if INP.Key(Keys.Space) == 1 then
+        self:OnFinishAnim()
+        self:OnCreateEntity()
+        self:ForceAnim(self.Animation,true,nil,0)
+    end
+end
+o.Immortal = true

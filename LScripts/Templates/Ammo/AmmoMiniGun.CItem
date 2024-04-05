@@ -1,0 +1,75 @@
+o.Mesh = "ammo_chaingun_2sidedShape"
+o.Pack = "pud_chaingun.dat"
+o.takeDistance = 1.8
+o.Scale = 1
+o.DisabledInVoosh = true
+o.AmmoAdd = 50
+o.RespawnTime = 15
+o.s_SubClass ={}
+
+--============================================================================
+function o:OnInitTemplate()
+    self.CubeMap = nil
+    self.DetailMap = nil
+    self.NormalMap = nil
+    self.Destroy = nil
+    self.Impulse = nil
+    self:ReplaceFunction("_Synchronize","Synchronize")
+    self:ReplaceFunction("Synchronize","nil")
+end
+--============================================================================
+function AmmoMiniGun:OnCreateEntity()
+	ENTITY.SetSynchroString(self._Entity,"AmmoMiniGun.CItem")
+    ENTITY.EnableNetworkSynchronization(self._Entity)
+	self:Client_OnCreateEntity(self._Entity)
+end
+--============================================================================
+--OriOn_Modification=######################################################################
+function AmmoMiniGun:Client_OnCreateEntity(entity)
+	if not IsDedicatedServer() then	
+		if Cfg.SimpleItems then	
+			if ENTITY.IsDrawEnabled(entity) then
+				ENTITY.EnableDraw(entity,false,true)
+				local e = ENTITY.Create(ETypes.Billboard,"Script","AmmoMiniGun")
+				local tex = "SIicon/Ammo/ammo_chaingun"
+				BILLBOARD.SetupCorona(e,1,0,0,0,0,0.7,0,0,0,tex,Color:New(255,255,0,0):Compose(),4,true)    
+				ENTITY.SetPosition(e,0,0.2,0)
+				ENTITY.RegisterChild(entity,e,true,0) 
+				WORLD.AddEntity(e)
+			end
+		end
+	end
+end
+--OriOn_Modification=end=######################################################################
+--============================================================================
+function AmmoMiniGun:OnTake(player)
+    if player.Ammo.MiniGun >= CPlayer.s_SubClass.MaxAmmo.MiniGun then return true end
+    self.TakeFX(player._Entity, self.AmmoAdd)
+	Game.PlayerAmmoFound =  Game.PlayerAmmoFound + 1
+end
+--============================================================================
+function AmmoMiniGun:TakeFX(pe,add)
+    local player = EntityToObject[pe]
+    
+    if player then
+        player.Ammo.MiniGun = player.Ammo.MiniGun + add * AmmoDifficultyModifier[Game.Difficulty] * Game.AmmoFoundFactor
+        player:CheckMaxAmmo()
+        if player == Player then player:PickupFX() end
+    end
+
+    Templates["AmmoMiniGun.CItem"]:SndEnt("pickup",pe)
+end
+Network:RegisterMethod("AmmoMiniGun.TakeFX", NCallOn.ServerAndAllClients, NMode.Reliable, "eu")
+--============================================================================
+--OriOn_Modification=######################################################################
+function AmmoMiniGun:Client_OnCreateSimpleItems(entity)	
+	ENTITY.KillAllChildrenByName(entity,"AmmoMiniGun") -- Pas frocément utile mais par sécuruté
+	local e = ENTITY.Create(ETypes.Billboard,"Script","AmmoMiniGun")
+	local tex = "SIicon/Ammo/ammo_chaingun"
+	BILLBOARD.SetupCorona(e,1,0,0,0,0,0.7,0,0,0,tex,Color:New(255,255,0,0):Compose(),4,true)    
+	ENTITY.SetPosition(e,0,0.2,0)
+	ENTITY.RegisterChild(entity,e,true,0) 
+	WORLD.AddEntity(e)
+end
+--OriOn_Modification=end=######################################################################
+--============================================================================

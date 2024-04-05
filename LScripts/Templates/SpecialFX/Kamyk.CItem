@@ -1,0 +1,33 @@
+Kamyk.Mesh = "pSphereShape1"
+Kamyk.Pack = "kamyk.dat"
+Kamyk.Scale = 0.2
+Kamyk.Restitution = 0.8 -- sprezystosc
+Kamyk.LinearDamping = 0.8  -- tlumienie liniowe
+
+function Kamyk:OnPrecache()
+    Cache:PrecacheParticleFX("KamykFX")
+	Cache:PrecacheParticleFX("KamykFXNoSmoke") --OriOn_Modification
+	Cache:PrecacheParticleFX("KamykFXNoImpact") --OriOn_Modification
+end
+
+function Kamyk:OnCreateEntity()
+    self:PO_Create(BodyTypes.Simple,0.2,ECollisionGroups.Particles)
+    ENTITY.RemoveFromIntersectionSolver(self._Entity)
+    ENTITY.PO_SetMovedByExplosions(self._Entity, false)
+
+	if not Cfg.NoSmoke and not Cfg.NoImpactFX then			--OriOn_Modification
+		local pfx = AddPFX('KamykFX',0.6)
+		ENTITY.RegisterChild(self._Entity,pfx)  
+	elseif Cfg.NoSmoke and not Cfg.NoImpactFX then
+		local pfx = AddPFX('KamykFXNoSmoke',0.6)
+		ENTITY.RegisterChild(self._Entity,pfx)  
+	elseif not Cfg.NoSmoke and Cfg.NoImpactFX then
+		local pfx = AddPFX('KamykFXNoImpact',0.6)
+		ENTITY.RegisterChild(self._Entity,pfx)   	--=end=OriOn_Modification
+	end
+end
+
+function Kamyk:OnInitTemplate()
+    self:ReplaceFunction("Update", nil)
+end
+
