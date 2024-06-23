@@ -571,6 +571,19 @@ function CPlayer:ClientTick(delta)
     self.ForwardVector:Set(CAM.GetForwardVector())
     self.RightVector:Set(CAM.GetRightVector())
   end
+
+    -- Autojump
+    if IsBitFlag(self.CurAction,Actions.Jump) then
+      if not self.autoJumped and PLAYER.FloorCheck(self._Entity) then
+        self.CurAction = AddBitFlag(self.CurAction,Actions.Jump)
+        self.autoJumped = true
+      else
+        self.CurAction = ReplaceBitFlag(self.CurAction,Actions.Jump,0)
+        self.autoJumped = nil
+      end
+    end
+    -- Autojump end
+
   if Game.GMode == GModes.MultiplayerClient then
     local fv = self.ForwardVector
     local rv = self.RightVector
