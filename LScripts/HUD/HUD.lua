@@ -707,6 +707,78 @@ function Hud:Render(delta)
       Hud:StatsText(Player.ClientID)
     end
   end
+
+	-- Display movement keys
+	HUD.SetFont("timesbd", 26)
+	local width = HUD.GetTextWidth("_")
+	local height = HUD.GetTextHeight()
+	local x = (w-width)/2
+	-- HUD.DrawQuadRGBA(0,x-width*2,h-height*4.5,width*5.5,height*3,15,15,15,100)
+	if INP.Action(Actions.Fire) then
+		local text = "*"
+		local x = x-width*1.35
+		local y = h-height*4.25
+		HUD.PrintXY(x,y,text,"timesbd",0,0,0,32)
+		HUD.PrintXY(x,y,text,"timesbd",200,200,200,30)
+		-- HUD.PrintXY(x,y,text,"timesbd",15,15,15,32)
+		-- HUD.PrintXY(x,y,text,"timesbd",230,161,97,30)
+	end
+	if INP.Action(Actions.Forward) then
+		local text = "^"
+		local y = h-height*4
+		HUD.PrintXY(x,y,text,"timesbd",0,0,0,37)
+		HUD.PrintXY(x,y,text,"timesbd",200,200,200,35)
+		-- HUD.PrintXY(x,y,text,"timesbd",15,15,15,37)
+		-- HUD.PrintXY(x,y,text,"timesbd",230,161,97,35)
+	end
+	if INP.Action(Actions.AltFire) then
+		local text = "*"
+		local x = x+width*1.65
+		local y = h-height*4.25
+		HUD.PrintXY(x,y,text,"timesbd",0,0,0,32)
+		HUD.PrintXY(x,y,text,"timesbd",200,200,200,30)
+		-- HUD.PrintXY(x,y,text,"timesbd",15,15,15,32)
+		-- HUD.PrintXY(x,y,text,"timesbd",230,161,97,30)
+	end
+	if INP.Action(Actions.Left) then
+		local text = "<"
+		local x = x-width*1.10
+		local y = h-height*3.40
+		HUD.PrintXY(x,y,text,"timesbd",0,0,0,28)
+		HUD.PrintXY(x,y,text,"timesbd",200,200,200,26)
+		-- HUD.PrintXY(x,y,text,"timesbd",15,15,15,28)
+		-- HUD.PrintXY(x,y,text,"timesbd",230,161,97,26)
+	end
+	if INP.Action(Actions.Jump) then
+		local text = "+"
+		local x = x+width*0.1
+		local y = h-height*3.5
+		HUD.PrintXY(x,y,text,"timesbd",0,0,0,32)
+		HUD.PrintXY(x,y,text,"timesbd",200,200,200,30)
+		-- HUD.PrintXY(x,y,text,"timesbd",15,15,15,32)
+		-- HUD.PrintXY(x,y,text,"timesbd",230,161,97,30)
+	end
+	if INP.Action(Actions.Right) then
+		local text = ">"
+		local x = x+width*1.5
+		local y = h-height*3.40
+		HUD.PrintXY(x,y,text,"timesbd",0,0,0,28)
+		HUD.PrintXY(x,y,text,"timesbd",200,200,200,26)
+		-- HUD.PrintXY(x,y,text,"timesbd",15,15,15,28)
+		-- HUD.PrintXY(x,y,text,"timesbd",230,161,97,26)
+	end
+	if INP.Action(Actions.Backward) then
+		local text = "V"
+		local x = x+width*0.1
+		local y = h-height*2.6
+		HUD.PrintXY(x,y,text,"timesbd",0,0,0,24)
+		HUD.PrintXY(x,y,text,"timesbd",200,200,200,23)
+		-- HUD.PrintXY(x,y,text,"timesbd",15,15,15,24)
+		-- HUD.PrintXY(x,y,text,"timesbd",230,161,97,23)
+	end
+	HUD.SetFont("timesbd", 26)
+	-- Display movement keys end
+
   if Game.IsDemon and not Lucifer_001 then
     return
   end
