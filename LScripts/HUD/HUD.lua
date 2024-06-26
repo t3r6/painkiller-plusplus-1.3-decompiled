@@ -707,6 +707,65 @@ function Hud:Render(delta)
       Hud:StatsText(Player.ClientID)
     end
   end
+
+	-- Display movement keys
+	HUD.SetFont("timesbd", 26)
+	local width = HUD.GetTextWidth("_")
+	local height = HUD.GetTextHeight()
+	local x = (w-width)/2
+	HUD.DrawQuadRGBA(0,x-width*2,h-height*4.5,width*5.5,height*3,15,15,15,100)
+	if INP.Action(Actions.Fire) then
+		local text = "*"
+		local x = x-width*1.7
+		local y = h-height*4.2
+		HUD.PrintXY(x,y,text,"timesbd",0,0,0,28)
+		HUD.PrintXY(x,y,text,"timesbd",72,113,247,26)
+	end
+	if INP.Action(Actions.Forward) then
+		local text = "W"
+    local x = x-width*0.1
+		local y = h-height*4.4
+		HUD.PrintXY(x,y,text,"timesbd",0,0,0,28)
+		HUD.PrintXY(x,y,text,"timesbd",72,113,247,26)
+	end
+	if INP.Action(Actions.AltFire) then
+		local text = "*"
+		local x = x+width*2.3
+		local y = h-height*4.2
+		HUD.PrintXY(x,y,text,"timesbd",0,0,0,28)
+		HUD.PrintXY(x,y,text,"timesbd",72,113,247,26)
+	end
+	if INP.Action(Actions.Left) then
+		local text = "A"
+		local x = x-width*1.8
+		local y = h-height*3.40
+		HUD.PrintXY(x,y,text,"timesbd",0,0,0,28)
+		HUD.PrintXY(x,y,text,"timesbd",72,113,247,26)
+	end
+	if INP.Action(Actions.Jump) then
+		local text = "-"
+		local x = x+width*0.5
+		local y = h-height*3.5
+		HUD.PrintXY(x,y,text,"timesbd",0,0,0,28)
+		HUD.PrintXY(x,y,text,"timesbd",72,113,247,26)
+	end
+	if INP.Action(Actions.Right) then
+		local text = "D"
+		local x = x+width*2
+		local y = h-height*3.40
+		HUD.PrintXY(x,y,text,"timesbd",0,0,0,28)
+		HUD.PrintXY(x,y,text,"timesbd",72,113,247,26)
+	end
+	if INP.Action(Actions.Backward) then
+		local text = "S"
+		local x = x+width*0.3
+		local y = h-height*2.5
+		HUD.PrintXY(x,y,text,"timesbd",0,0,0,28)
+		HUD.PrintXY(x,y,text,"timesbd",72,113,247,26)
+	end
+	HUD.SetFont("timesbd", 26)
+	-- Display movement keys end
+
   if Game.IsDemon and not Lucifer_001 then
     return
   end
